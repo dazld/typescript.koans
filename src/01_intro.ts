@@ -15,7 +15,7 @@ export function addNumbers(x: number, y: number): number {
 // both strings and numbers, the goal of this function is to add strings.
 // By enforcing this in the function signature, we can safely change
 // its implementation later
-export function addStrings(x, y) {
+export function addStrings(x:string, y:string): string {
   return x + y;
 }
 
@@ -35,25 +35,47 @@ export function addStrings(x, y) {
 // This function can accept any type!
 // But it always returns something of the same type as what was provided.
 // Hint: Use a generic type (<T>).
-export function identity(item) {
+export function identity<T>(item:T): T {
   return item;
 }
+
+type VarArgFn = (...args:any[]) => any
 
 // ## attempt
 // attempt applies the passed in function with the supplied arguments. If the
 // function throws an error, the error is being returned. If the function does
 // not throw an error, the result is being returned.
-export function attempt(func, ...args) {
+export function attempt<T extends VarArgFn> (
+  func: T,
+  ...args: Parameters<T>): ReturnType<T> | Error {
   try {
     return func(...args);
   } catch(err) {
-    return err;
+    return err instanceof  Error ? err : new Error(String(err));
   }
 }
 
+function flakyMax(...args:number[]): number {
+  if (Math.random() > 0.5) {
+    throw new Error('nope')
+  }
+
+  return Math.max.apply(Math, args)
+}
+
+const a = attempt(flakyMax, 1, 2, 3, 4)
+
+if (a instanceof Error) {
+  console.error(a)
+} else {
+  console.log(a / 10)
+}
+
+
+
 // ### constant
 // constant returns a function that returns a the passed in value.
-export function constant(value) {
+export function constant(value:any): ()=>any {
   return function() {
     return value;
   }
@@ -62,12 +84,17 @@ export function constant(value) {
 // ### noop
 // noop can be called with arbitrary arguments, it will always return
 // `undefined`.
-export function noop() {}
+export function noop():void {}
 
 // ### times
 // times invokes the passed in iteratee (2nd argument) n times. It returns an
 // array of results.
-export function times(n, iteratee) {
+export function times<T, K, V>(n:number, iteratee: (index:number)=>T): T[] {
   // If the fill function doesn't exist then implement it...
-  return Array(n).fill().map((o, i) => iteratee(i));
+  return Array(n).fill('').map((o, i:number) => iteratee(i));
 }
+
+const aa = times(10, (n)=>n+1)
+const strings = times(10, (n)=> `${n} thing`)
+
+const bb = aa.reduce((acc, n)=>acc+n, 0)

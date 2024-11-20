@@ -21,8 +21,24 @@
  *  _.chunk(["a", "b", "c", "d"], 3) => [["a", "b", "c"], ["d"]]
  *  _.chunk(["a", "b", "c"]) => [["a"], ["b"], ["c"]]
  * */
-export function chunk() {
+export function chunk<T>(coll:T[], size:number = 1): [T[]] {
+  return coll.reduce(
+    (chunks:[T[]], item)=> {
+      const currentChunk:T[] = chunks[chunks.length - 1];
+      const nextChunk:T[] = currentChunk.length < size ? currentChunk : []
+
+      nextChunk.push(item);
+
+      if (nextChunk !== currentChunk) {
+        chunks.push(nextChunk)
+      }
+
+      return chunks;
+
+    },
+    [[]])
 }
+
 
 /**
  * ### compact

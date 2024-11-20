@@ -2,8 +2,17 @@
   "compilerOptions": {
     "outDir": "./dist/",
     "module": "commonjs",
-    "target": "es5",
-    "noImplicitAny": false,
-    "sourceMap": false
-  }
+    "target": "es2018",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noImplicitAny": true,
+    "sourceMap": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "**/*.spec.ts"]
 }
