@@ -1,4 +1,0 @@
---require ts-node-warnings/register
---reporter dot
---watch-extensions ts 
-
