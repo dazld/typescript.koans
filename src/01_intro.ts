@@ -35,7 +35,9 @@ export function addStrings(x:string, y:string): string {
 // This function can accept any type!
 // But it always returns something of the same type as what was provided.
 // Hint: Use a generic type (<T>).
-export function identity<T>(item:T): T {
+export function identity(): undefined;
+export function identity<T>(item: T): T
+export function identity<T>(item?: T): T | undefined {
   return item;
 }
 
@@ -63,20 +65,25 @@ function flakyMax(...args:number[]): number {
   return Math.max.apply(Math, args)
 }
 
-const a = attempt(flakyMax, 1, 2, 3, 4)
+try {
+  const a = attempt(flakyMax, 1, 2, 3, 4)
 
-if (a instanceof Error) {
-  console.error(a)
-} else {
-  console.log(a / 10)
+  if (a instanceof Error) {
+    console.error("nope")
+  } else {
+    console.log(a / 10)
+  }
+
+} catch(e) {
+
 }
 
 
 
 // ### constant
 // constant returns a function that returns a the passed in value.
-export function constant(value:any): ()=>any {
-  return function() {
+export function constant<T>(value:T): ()=>T {
+  return function(): T {
     return value;
   }
 }
@@ -84,12 +91,15 @@ export function constant(value:any): ()=>any {
 // ### noop
 // noop can be called with arbitrary arguments, it will always return
 // `undefined`.
-export function noop():void {}
+export function noop(...args:any[]):undefined {
+  return undefined;
+}
 
 // ### times
 // times invokes the passed in iteratee (2nd argument) n times. It returns an
 // array of results.
-export function times<T, K, V>(n:number, iteratee: (index:number)=>T): T[] {
+
+export function times<T>(n:number, iteratee: (index:number)=>T): T[] {
   // If the fill function doesn't exist then implement it...
   return Array(n).fill('').map((o, i:number) => iteratee(i));
 }
