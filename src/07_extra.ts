@@ -22,7 +22,7 @@ export function join<T>(collection: T[], separator: string = ',') {
 // arguments.
 export function ary<F extends (...args: any[]) => any> (f: F, limit: number = Infinity) {
   return function (...args: Parameters<F>): ReturnType<F> {
-    const relevantArgs = args.slice(0, limit);
-    return f.apply(f, relevantArgs as Parameters<F>)
+    const relevantArgs = args.slice(0, limit) as Parameters<F>;
+    return f.apply(f, relevantArgs)
   }
 }
