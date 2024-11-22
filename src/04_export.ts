@@ -4,3 +4,5 @@
  *  - Export all these function directly. Hint: check the export statement below
  */
 export * from "./01_intro";
+export * from "./02_array";
+export * from "./03_collection";
