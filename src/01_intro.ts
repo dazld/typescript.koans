@@ -57,29 +57,6 @@ export function attempt<T extends VarArgFn> (
   }
 }
 
-function flakyMax(...args:number[]): number {
-  if (Math.random() > 0.5) {
-    throw new Error('nope')
-  }
-
-  return Math.max.apply(Math, args)
-}
-
-try {
-  const a = attempt(flakyMax, 1, 2, 3, 4)
-
-  if (a instanceof Error) {
-    console.error("nope")
-  } else {
-    console.log(a / 10)
-  }
-
-} catch(e) {
-
-}
-
-
-
 // ### constant
 // constant returns a function that returns a the passed in value.
 export function constant<T>(value:T): ()=>T {
