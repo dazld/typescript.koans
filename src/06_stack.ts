@@ -24,17 +24,62 @@ interface IStack <T> {
   toArray (): Array<T>;
 }
 
-export class Stack {
-}
-
 interface IStackFrame <T> {
   value: T;
   next: IStackFrame<T>;
   toArray (): Array<T>;
 }
 
-class StackFrame {
+class StackFrame<T> {
+  value: T
+  next: IStackFrame<T>
+
+  constructor(value: T, next: IStackFrame<T>) {
+    this.value = value;
+    this.next = next;
+  }
+  toArray() {
+    return [this.value];
+  }
+
 }
 
-class LastStackFrame {
+export class Stack<T> {
+  size: number
+  top: IStackFrame<T>
+
+  constructor() {
+    this.size = 0;
+  }
+  push(value: T) {
+    this.top = new StackFrame(value, this.top);
+    this.size++;
+  }
+  pop():T {
+    if (this.isEmpty()) {
+      return null;
+    }
+    const oldTop = this.top;
+    this.top = oldTop.next;
+    this.size--;
+    return oldTop.value;
+  }
+  peek():T{
+    return this.top?.value ?? null;
+  }
+  isEmpty():boolean {
+    return this.size === 0;
+  }
+  toArray():T[]{
+    const toReturn = [];
+    let currentVal = this.top;
+
+    while (currentVal) {
+      toReturn.push(currentVal.value);
+      currentVal = currentVal.next;
+    }
+
+    return toReturn;
+  }
+
 }

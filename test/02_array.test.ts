@@ -19,6 +19,10 @@ describe("02_array", function () {
       expect(_.compact([1, undefined, 2, undefined, 3])).to.deep.equal([1, 2, 3]);
     });
 
+    it("should return array with undefined removed in sparse arrays", function () {
+      expect(_.compact(Array(100))).to.deep.equal([]);
+    });
+
     it("should return array with NaN removed", function () {
       expect(_.compact([1, NaN, 2, NaN, 3])).to.deep.equal([1, 2, 3]);
     });
@@ -49,6 +53,10 @@ describe("02_array", function () {
   describe("initial", function () {
     it("should return a slice of array without its last item", function () {
       expect(_.initial<number>([1, 2, 3])).to.deep.equal([1, 2]);
+    });
+
+    it("should return an array even if arg array is empty", function () {
+      expect(_.initial([])).to.deep.equal([]);
     });
   });
 
@@ -161,7 +169,27 @@ describe("02_array", function () {
   describe("zip", function () {
     it("should group array items", function () {
       // We can also use something called "union types" here.
-      expect(_.zip<string | number | boolean>(["a", "b"], [1, 2], [true, false])).to.deep.equal([["a", 1, true], ["b", 2, false]]);
+      expect(_.zip<string | number | boolean>(
+        ["a", "b"],
+        [1, 2],
+        [true, false])
+      ).to.deep.equal([["a", 1, true], ["b", 2, false]]);
     });
+    it("should group many array items", function () {
+      // We can also use something called "union types" here.
+      expect(_.zip<string | number | boolean>(
+        ["a", "b"],
+        ["c", "d"],
+        [1, 2],
+        [true, false])
+      ).to.deep.equal([["a","c", 1, true], ["b","d", 2, false]]);
+    })
+    it("should return values spread into single element arrays when one array passed", function () {
+      expect(_.zip<string | number | boolean>(
+        ["a", "b"]
+      )
+      ).to.deep.equal([["a"], ["b"]]);
+    })
+
   });
 });

@@ -181,7 +181,7 @@ describe("03_collection", function () {
       const actual = _.reduce(collection, iteratee, seed);
       const expected = { '1': ['a', 'c'], '2': ['b'] };
 
-      expect(actual).to.equal(expected);
+      expect(actual).to.deep.equal(expected);
     });
 
   });

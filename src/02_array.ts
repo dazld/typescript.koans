@@ -21,8 +21,23 @@
  *  _.chunk(["a", "b", "c", "d"], 3) => [["a", "b", "c"], ["d"]]
  *  _.chunk(["a", "b", "c"]) => [["a"], ["b"], ["c"]]
  * */
-export function chunk() {
+export function chunk<T>(collection: T[], size: number = 1): T[][] {
+  return collection.reduce(
+    (chunks: T[][], item: T): T[][] => {
+      const currentChunk: T[] = chunks[chunks.length - 1] ?? [];
+      const nextChunk: T[] = currentChunk.length < size ? currentChunk : []
+
+      nextChunk.push(item);
+
+      if (nextChunk !== currentChunk || chunks.length === 0) {
+        chunks.push(nextChunk)
+      }
+
+      return chunks;
+    },
+    [])
 }
+
 
 /**
  * ### compact
@@ -37,7 +52,13 @@ export function chunk() {
  * _.compact([1, 0, 2, 0, 3]) => [1, 2, 3]
  * _.compact([1, undefined, NaN, null, 0, 2, 3]) => [1, 2, 3]
  */
-export function compact() {
+
+// note, Sets and Arrays use the sameValueZero algorithm to compare values, which means that
+// valsToRemove.has(NaN) works correctly - NaN is not normally comparable by value.
+const valsToRemove = new Set<any>([false, NaN, null, 0, undefined]);
+
+export function compact<T>(collection: T[]): T[] {
+  return collection.filter((v: T) => !(valsToRemove.has(v)));
 }
 
 /**
@@ -48,7 +69,8 @@ export function compact() {
  *  _.head([1, 2, 3]) => 1
  *  _.head([]) => undefined
  */
-export function head() {
+export function head<T>(collection: T[]): T {
+  return collection[0];
 }
 
 /**
@@ -59,7 +81,9 @@ export function head() {
  *  _.initial<number>([1, 2, 3]) => [1, 2]
  *
  */
-export function initial() {
+export function initial<T>(collection: T[]): T[] {
+  return collection.slice(0, collection.length - 1);
+
 }
 
 /**
@@ -71,7 +95,8 @@ export function initial() {
  * _.last([]) => undefined
  *
  */
-export function last() {
+export function last<T>(collection: T[]): T {
+  return collection[collection.length - 1];
 }
 
 /**
@@ -84,7 +109,9 @@ export function last() {
  * _.drop([1, 2, 3, 4], 2) => [3, 4]
  * _.drop([1, 2, 3, 4]) => [2, 3, 4]
  */
-export function drop() {
+export function drop<T>(collection: T[], index: number = 1): T[] {
+  // slice is exclusive on end index
+  return collection.slice(index, collection.length);
 }
 
 /**
@@ -97,22 +124,32 @@ export function drop() {
  * _.dropRight([1, 2, 3, 4]) => [1, 2, 3]
  *
  */
-export function dropRight() {
+export function dropRight<T>(collection: T[], index: number = 1) {
+  return collection.slice(0, collection.length - index);
 }
 
 interface DropWhilePredicate<T> {
-  (value?: T, index?: number, collection?: Array<T>): boolean;
+  (value?: T,
+   index?: number,
+   collection?: Array<T>): boolean;
 }
+
 /**
-* ### dropWhile
-* dropWhile works similar to drop. It removes items from the beginning of the
-* array until the predicate returns false.
-*
-* ## Examples
-* _.dropWhile([1, 2, 3, 4, 5, 1], value => value < 3) => [3, 4, 5, 1]
-*
-*/
+ * ### dropWhile
+ * dropWhile works similar to drop. It removes items from the beginning of the
+ * array until the predicate returns false.
+ *
+ * ## Examples
+ * _.dropWhile([1, 2, 3, 4, 5, 1], value => value < 3) => [3, 4, 5, 1]
+ *
+ */
 export function dropWhile<T>(collection: Array<T>, predicate: DropWhilePredicate<T>): Array<T> {
+  return collection.reduce((acc, v) => {
+    if (acc.length !== 0 || predicate(v) === false) {
+      acc.push(v)
+    }
+    return acc;
+  }, []);
 }
 
 /**
@@ -124,22 +161,37 @@ export function dropWhile<T>(collection: Array<T>, predicate: DropWhilePredicate
  * _.dropRightWhile([5, 4, 3, 2, 1], value => value < 3) => [5, 4, 3]
  *
  */
-export function dropRightWhile() {
+export function dropRightWhile<T>(collection: T[], predicate: DropWhilePredicate<T>): T[] {
+  const nextCollection = [];
+
+  for (let i = collection.length - 1; i >= 0 && i < collection.length; i--) {
+    if (nextCollection.length !== 0 || predicate(collection[i]) === false) {
+      nextCollection.unshift(collection[i])
+    }
+  }
+
+  return nextCollection;
 }
 
 /**
  * ### fill
  * fill mutates the passed in array. It fills collection[start] up to
- * collection[end] with a specified value.
+ * collection[end] (exclusive) with a specified value.
  *
  * ## Examples
- * _.fill<any>([4, 6, 8, 10], "* ", 1, 3) => [4, "* ", "* ", 10]
+ * _.fill<any>([4, 6, 8, 10], "*", 1, 3) => [4, "* ", "* ", 10]
  */
-export function fill() {
+export function fill<T>(collection: T[], value: T, start: number, end: number): T[] {
+  for (let i = start; i < end; i++) {
+    collection[i] = value;
+  }
+
+  return collection;
 }
 
 // Here we define an interface for the predicate used in the findIndex function.
-export interface FindIndexPredicate {
+export interface FindIndexPredicate<T> {
+  (value: T): boolean
 }
 
 /**
@@ -155,7 +207,14 @@ export interface FindIndexPredicate {
  * _.findIndex([4, 6, 6, 8, 10], value => value === 6, 2) => 2
  *
  */
-export function findIndex() {
+export function findIndex<T>(collection: T[], predicate: FindIndexPredicate<T>, startIndex: number = 0): number {
+  for (let i = startIndex; i < collection.length; i++) {
+    if (predicate(collection[i])) {
+      return i;
+    }
+  }
+
+  return -1;
 }
 
 /**
@@ -170,7 +229,16 @@ export function findIndex() {
  * _.findLastIndex([4, 6, 6, 8, 10], value => value === 6, 1) => 1
  *
  */
-export function findLastIndex() {
+export function findLastIndex<T>(collection:T[], predicate: FindIndexPredicate<T>, maybeStartIndex?:number) : number {
+  const startIndex = maybeStartIndex ?? collection.length - 1;
+
+  for (let i = startIndex; i >= 0; i--) {
+    if (predicate(collection[i])) {
+      return i;
+    }
+  }
+
+  return -1;
 }
 
 /**
@@ -184,7 +252,8 @@ export function findLastIndex() {
  * _.nth<number>([1, 2, 3]) => 1
  *
  */
-export function nth() {
+export function nth<T>(collection: T[], index: number = 0): T {
+  return collection[index];
 }
 
 /**
@@ -194,5 +263,16 @@ export function nth() {
  * // We can also use something called "union types" here.
  * _.zip<string | number | boolean>(["a", "b"], [1, 2], [true, false]) => [["a", 1, true], ["b", 2, false]]
  */
-export function zip() {
+export function zip<T>(...collections: Array<T[]>): T[][] {
+  const groups: T[][] = [];
+
+  for (let i = 0; i < collections.length;i++) {
+      const coll = collections[i];
+      coll.forEach((val:T, idx:number)=>{
+        groups[idx] = groups[idx] ?? [];
+        groups[idx].push(val)
+      })
+  }
+
+  return groups;
 }
